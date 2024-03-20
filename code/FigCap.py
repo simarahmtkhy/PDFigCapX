@@ -29,10 +29,16 @@ import subprocess
 import os
 import time
 
-if __name__ == "__main__":
+# paths
+input_root_path = ''
+output_root_path = ''
+pdftohtml_path = ''
 
-    input_path = '/eecis/shatkay/homes/pengyuan/Documents/RESEARCH/PDFigCapX/code/sample_data_for_Juan'
-    output_path = '/eecis/shatkay/homes/pengyuan/Documents/RESEARCH/PDFigCapX/code/sample_data_for_Juan'
+def get_figures_captions(input_path, output_path):
+    if not(os.path.isdir(input_folder_path)):
+        return
+    if not os.path.isdir(output_path):
+        os.mkdir(output_path)
     xpdf_path = output_path +'/xpdf/'  
     log_file = output_path + '/log.text'
     f_log = open(log_file, 'w') 
@@ -40,9 +46,9 @@ if __name__ == "__main__":
         os.mkdir(xpdf_path)
 # Read each files in the input path
     for pdf in os.listdir(input_path):
-        if pdf.endswith('.pdf') and (not pdf.startswith('._')):
+        if pdf.lower().endswith('.pdf') and (not pdf.startswith('._')):
             data = {}
-            print input_path+pdf
+            print(input_path+pdf)
             images = renderer.render_pdf(input_path + '/' + pdf)
             data[pdf] = {}
             data[pdf]['figures'] = []
@@ -50,9 +56,9 @@ if __name__ == "__main__":
             pdf_flag = 0
             try:
                 if not os.path.isdir(xpdf_path+pdf[:-4]):
-                    std_out = subprocess.check_output(["/usa/pengyuan/Documents/RESEARCH/PDFigCapX/xpdf-tools-linux-4.00/bin64/pdftohtml", input_path+'/'+pdf, xpdf_path+pdf[:-4]+'/'])
+                    std_out = subprocess.check_output([pdftohtml_path, input_path+'/'+pdf, xpdf_path+pdf[:-4]+'/'])
             except:
-                print "\nWrong "+pdf+"\n"
+                print("\nWrong "+pdf+"\n")
                 f_log.write(pdf+'\n')
                 pdf_flag = 1
 
@@ -67,10 +73,10 @@ if __name__ == "__main__":
                     except:
                         wrong_count = wrong_count +1
                         time.sleep(5)
-                        print pdf
+                        print(pdf)
                         info['fig_no_est']=0
                         figures = []
-                        print "------\nChrome Error\n----------\n"
+                        print("------\nChrome Error\n----------\n")
         
                 data[pdf]['fig_no'] = info['fig_no_est']
 
@@ -92,25 +98,25 @@ if __name__ == "__main__":
 
                         if len(bbox[1])>0:
                             data[pdf]['figures'].append({'page': page_no,
-                                          'region_bb': bbox[0],
-                                         'figure_type': 'Figure',
+                                        'region_bb': bbox[0],
+                                        'figure_type': 'Figure',
                                         'page_width': info['page_width'],
                                         'page_height': info['page_height'],
                                         'caption_bb': bbox[1][0],
                                         'caption_text': bbox[1][1]
-                                         })
+                                        })
                             with open(output_file_path+'/'+str(page_no)+'_'+str(order_no)+'.txt', 'w') as capoutput:
                                 capoutput.write(str(bbox[1][1]))
                                 capoutput.close
                         else:
                             data[pdf]['figures'].append({'page': page_no,
-                                                     'region_bb': bbox[0],
-                                                     'figure_type': 'Figure',
-                                                     'page_width': info['page_width'],
-                                                     'page_height': info['page_height'],
-                                                     'caption_bb': [],
-                                                     'caption_text': []
-                                                     })
+                                                    'region_bb': bbox[0],
+                                                    'figure_type': 'Figure',
+                                                    'page_width': info['page_width'],
+                                                    'page_height': info['page_height'],
+                                                    'caption_bb': [],
+                                                    'caption_text': []
+                                                    })
                         fig_extracted = page_fig.crop([int(bbox[0][0]*png_ratio), int(bbox[0][1]*png_ratio), 
                                         int((bbox[0][0]+bbox[0][2])*png_ratio), int((bbox[0][1]+bbox[0][3])*png_ratio)])
                         fig_extracted.save(output_file_path+'/'+str(page_no)+'_'+str(order_no)+'.jpg')
@@ -119,4 +125,13 @@ if __name__ == "__main__":
                 json_file = output_file_path+'/'+ pdf[:-4]+'.json'
                 with open(json_file, 'w') as outfile:
                     json.dump(data, outfile)
+        elif os.path.isdir(input_path + "/" + pdf):
+            get_figures_captions(input_path + "/" + pdf, output_path + "/" + pdf)
+            
 
+if __name__ == "__main__":
+    for folder in os.listdir(input_root_path):
+        input_folder_path = os.path.join(input_root_path, folder)
+        output_folder_path = os.path.join(output_root_path, folder)
+        get_figures_captions(input_folder_path, output_folder_path)
+        

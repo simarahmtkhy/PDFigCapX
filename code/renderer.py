@@ -7,7 +7,7 @@ import tempfile
 #output_dpi = str(72)
 
 
-def render_pdf(filename, customize_dpi):
+def render_pdf(filename, customize_dpi = 150):
     """
         This function renders the document unsing imagemagick and returns a list of images, one for each page.
         The images are PIL Image type.
@@ -34,10 +34,12 @@ def render_pdf(filename, customize_dpi):
             imagemagickPath + ' -density ' + rasterDensity + ' -resample ' + output_dpi + ' -set colorspace RGB ' +
             filename + ' ' + os.path.join(outputDir, 'image.png'))
     else:
+        command = 'gs -q -sDEVICE=png16m -o "{}" -r{} "{}"'.format(
+        os.path.join(outputDir, 'file-%02d.png'), output_dpi, filename)
         os.system(
             # 'convert -density ' + rasterDensity + ' -resample ' + output_dpi + ' -set colorspace RGB ' + filename + ' ' + outputDir + 'image.png')
             #'convert -density ' + output_dpi + ' -resample ' + output_dpi + ' -set colorspace RGB ' + filename + ' ' + outputDir + 'image.png')
-            'gs -q -sDEVICE=png16m -o ' + os.path.join(outputDir, 'file-%02d.png') + ' -r' + output_dpi + ' ' + filename)
+            command)
 
     files = [f for f in os.listdir(outputDir) if os.path.isfile(os.path.join(outputDir, f)) and not f.startswith('.')]
     files = natural_sort(files)

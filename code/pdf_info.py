@@ -5,6 +5,7 @@ filename, height, width, page_no, figure_est_no, layout_bbox, text_mask
 }
 '''
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from multiprocessing import Pool, TimeoutError
 import time
 import os
@@ -37,15 +38,20 @@ def pdf_info(html_file_path, pdf):
         with open(html_info_json) as json_data:
             html_info = json.load(json_data)
     else:
-        browser = webdriver.Chrome('/usa/pengyuan/Documents/RESEARCH/PDFigCapX/chromedriver/chromedriver')
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        browser = webdriver.Chrome(options=chrome_options)
+        # print("Found Chrome WebDriver at:", browser.executable_path)
         for page_id in range(page_no):
             page = for_counting[page_id]
             html_file = 'file://' + html_file_path + '/' + page[:-4] + '.html'
             list_of_htmls.append(html_file)
             browser.get(html_file)
-            page_layout = browser.find_element_by_xpath("/html/body/img")
+            page_layout = browser.find_element("xpath","/html/body/img")
             img_size = (page_layout.size['height'], page_layout.size['width'])
-            text_elements = browser.find_elements_by_xpath("/html/body/div")
+            text_elements = browser.find_elements("xpath", "/html/body/div")
             text_boxes = []
             for element in text_elements:
                 text = element.text
@@ -267,19 +273,19 @@ def pdf_info(html_file_path, pdf):
 
 
 
-def read_each_html(x):
-    #browser = webdriver.Chrome('/home/pengyuan/chromedriver')
-    #browser = webdriver.Chrome('/usa/pengyuan/Documents/RESEARCH/PDFigCapX/chromedriver/chromedriver')
-    #browser.implicitly_wait(2)
-    browser.get(x)
-    page_layout = browser.find_element_by_xpath("/html/body/img")
-    img_size = (page_layout.size['height'], page_layout.size['width'])
-    text_elements = browser.find_elements_by_xpath("/html/body/div")
-    text_boxes = []
-    for element in text_elements:
-        text = element.text
-        if len(text) > 0:
-            text_boxes.append([[element.location['x'], element.location['y'], element.size['width'], element.size['height']], text])
+# def read_each_html(x):
+#     #browser = webdriver.Chrome('/home/pengyuan/chromedriver')
+#     #browser = webdriver.Chrome('/usa/pengyuan/Documents/RESEARCH/PDFigCapX/chromedriver/chromedriver')
+#     #browser.implicitly_wait(2)
+#     browser.get(x)
+#     page_layout = browser.find_element_by_xpath("/html/body/img")
+#     img_size = (page_layout.size['height'], page_layout.size['width'])
+#     text_elements = browser.find_elements_by_xpath("/html/body/div")
+#     text_boxes = []
+#     for element in text_elements:
+#         text = element.text
+#         if len(text) > 0:
+#             text_boxes.append([[element.location['x'], element.location['y'], element.size['width'], element.size['height']], text])
 
-    browser.quit()
-    return int(os.path.basename(x)[4:-5]), text_boxes, img_size
+#     browser.quit()
+#     return int(os.path.basename(x)[4:-5]), text_boxes, img_size

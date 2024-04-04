@@ -28,11 +28,12 @@ from xpdf_process import figures_captions_list
 import subprocess
 import os
 import time
+from argparse import ArgumentParser
 
 # paths
-input_root_path = ''
-output_root_path = ''
-pdftohtml_path = ''
+input_root_path = 'books/'
+output_root_path = 'output/'
+pdftohtml_path = 'usr/local/bin/pdftohtml'
 
 def get_figures_captions(input_path, output_path):
     if not(os.path.isdir(input_folder_path)):
@@ -127,9 +128,19 @@ def get_figures_captions(input_path, output_path):
                     json.dump(data, outfile)
         elif os.path.isdir(input_path + "/" + pdf):
             get_figures_captions(input_path + "/" + pdf, output_path + "/" + pdf)
-            
 
 if __name__ == "__main__":
+
+    parser = ArgumentParser()
+    parser.add_argument("-i", "--input", dest="input", help="input folder path")
+    parser.add_argument("-o", "--output", dest="output", help="output folder path")
+    parser.add_argument("-p", "--pdftohtml", dest="pdftohtml", help="pdftohtml path")
+    args = parser.parse_args()
+
+    input_root_path = args.input
+    output_root_path = args.output
+    pdftohtml_path = args.pdftohtml
+
     for folder in os.listdir(input_root_path):
         input_folder_path = os.path.join(input_root_path, folder)
         output_folder_path = os.path.join(output_root_path, folder)

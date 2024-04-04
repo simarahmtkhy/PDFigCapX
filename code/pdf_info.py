@@ -14,6 +14,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import cv2
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
     # Column width, middle gap, Maximum Figure number will be helpful
 def pdf_info(html_file_path, pdf):
@@ -49,6 +52,7 @@ def pdf_info(html_file_path, pdf):
             html_file = 'file://' + html_file_path + '/' + page[:-4] + '.html'
             list_of_htmls.append(html_file)
             browser.get(html_file)
+            WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.TAG_NAME, "img")))
             page_layout = browser.find_element("xpath","/html/body/img")
             img_size = (page_layout.size['height'], page_layout.size['width'])
             text_elements = browser.find_elements("xpath", "/html/body/div")

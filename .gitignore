@@ -1,0 +1,4 @@
+books/
+output/
+*/__pycache__
+*.log

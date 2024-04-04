@@ -22,6 +22,11 @@ RUN git clone https://github.com/simarahmtkhy/PDFigCapX.git
 RUN wget https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.105/linux64/chrome-linux64.zip
 RUN wget https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.105/linux64/chromedriver-linux64.zip
 
+# Install pdftohtml
+RUN wget https://dl.xpdfreader.com/xpdf-tools-linux-4.05.tar.gz
+RUN tar -xvf xpdf-tools-linux-4.05.tar.gz
+RUN cp xpdf-tools-linux-4.05/bin64/pdftohtml /usr/local/bin/
+
 RUN unzip chrome-linux64.zip
 RUN unzip chromedriver-linux64.zip
 
@@ -31,4 +36,4 @@ RUN mv chrome /usr/local/bin/
 RUN conda create -n figcap python=3.8
 RUN conda install -c conda-forge selenium==3.141.0
 
-ENTRYPOINT [ "python", "code/FigCap.py"]
+ENTRYPOINT [ "python", "code/FigCap.py", "-i", "book", "-o", "output"]

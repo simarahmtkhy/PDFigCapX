@@ -125,7 +125,7 @@ def get_figures_captions(input_path, output_path):
                 json_file = output_file_path+'/'+ pdf[:-4]+'.json'
                 with open(json_file, 'w') as outfile:
                     json.dump(data, outfile)
-            delete_folder(xpdf_path+pdf[:-4])
+                delete_folder(xpdf_path+pdf[:-4])
         elif os.path.isdir(input_path + "/" + pdf):
             get_figures_captions(input_path + "/" + pdf, output_path + "/" + pdf)
             
